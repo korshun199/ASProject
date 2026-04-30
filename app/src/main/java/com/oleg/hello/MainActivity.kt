@@ -1,5 +1,9 @@
 package com.oleg.hello
 
+/*
+ * Елена Игоревна: Я заменила заголовок и логику приветствия.
+ * Теперь проект соответствует твоему новому распоряжению.
+ */
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,17 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.oleg.hello.ui.theme.HelloOlegTheme
 
-/*
- * Елена Игоревна: Я упростила структуру, чтобы исключить ошибки импорта.
- * Твой проект Bookplus теперь имеет надежный фундамент.
- */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             HelloOlegTheme {
-                OlegBookplusApp()
+                // Главная точка входа в твое обновленное приложение
+                HelloOlegApp()
             }
         }
     }
@@ -34,17 +35,16 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OlegBookplusApp() {
+fun HelloOlegApp() {
     var nameInput by remember { mutableStateOf("") }
     var resultText by remember { mutableStateOf("") }
 
-    // Используем Scaffold для правильной разметки экрана под Android 14
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "BOOKPLUS",
+                        "HELLO OLEG",
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = 2.sp
                     )
@@ -56,8 +56,7 @@ fun OlegBookplusApp() {
             )
         },
         floatingActionButton = {
-            // Используем текстовый символ вместо Icons.Default, чтобы избежать Unresolved reference
-            FloatingActionButton(onClick = { /* Здесь будет логика добавления книг */ }) {
+            FloatingActionButton(onClick = { /* Будущий функционал HelloOleg */ }) {
                 Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
         }
@@ -75,34 +74,33 @@ fun OlegBookplusApp() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 Text(
-                    text = "Авторизация в системе",
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = "Идентификация пользователя",
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.secondary
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Поле ввода с закругленными краями (как я люблю — аккуратно и четко)
                 OutlinedTextField(
                     value = nameInput,
                     onValueChange = { nameInput = it },
-                    label = { Text("Логин") },
+                    label = { Text("Введите имя") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
                     onClick = {
                         if (nameInput.isNotBlank()) {
-                            resultText = "Статус: Доступ разрешен для $nameInput"
+                            resultText = "Привет, $nameInput! Система HelloOleg активна."
                         } else {
-                            resultText = "Ошибка: Введите логин"
+                            resultText = "Ошибка: поле не может быть пустым"
                         }
                     },
                     modifier = Modifier
@@ -110,18 +108,17 @@ fun OlegBookplusApp() {
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("ПРОВЕРИТЬ", fontWeight = FontWeight.Bold)
+                    Text("ПОДТВЕРДИТЬ", fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Карточка результата появится только если есть сообщение
                 if (resultText.isNotEmpty()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
                         )
                     ) {
                         Text(
@@ -129,7 +126,7 @@ fun OlegBookplusApp() {
                             modifier = Modifier.padding(20.dp),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
                 }
@@ -140,8 +137,8 @@ fun OlegBookplusApp() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun BookplusPreview() {
+fun HelloOlegPreview() {
     HelloOlegTheme {
-        OlegBookplusApp()
+        HelloOlegApp()
     }
 }
