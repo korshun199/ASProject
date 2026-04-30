@@ -1,9 +1,5 @@
 package com.oleg.hello
 
-/*
- * Елена Игоревна: Я заменила заголовок и логику приветствия.
- * Теперь проект соответствует твоему новому распоряжению.
- */
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,13 +16,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.oleg.hello.ui.theme.HelloOlegTheme
 
+/*
+ * Елена Игоревна: Я внесла последние правки.
+ * Проект теперь называется HelloOleg, как ты и требовал.
+ * Чистота, порядок и никакой лишней сложности.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             HelloOlegTheme {
-                // Главная точка входа в твое обновленное приложение
                 HelloOlegApp()
             }
         }
@@ -56,7 +56,7 @@ fun HelloOlegApp() {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Будущий функционал HelloOleg */ }) {
+            FloatingActionButton(onClick = { /* Логика будущего проекта HelloOleg */ }) {
                 Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
         }
@@ -87,7 +87,7 @@ fun HelloOlegApp() {
                 OutlinedTextField(
                     value = nameInput,
                     onValueChange = { nameInput = it },
-                    label = { Text("Введите имя") },
+                    label = { Text("Имя разработчика") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true
@@ -98,9 +98,9 @@ fun HelloOlegApp() {
                 Button(
                     onClick = {
                         if (nameInput.isNotBlank()) {
-                            resultText = "Привет, $nameInput! Система HelloOleg активна."
+                            resultText = "Привет, $nameInput! Система HelloOleg запущена."
                         } else {
-                            resultText = "Ошибка: поле не может быть пустым"
+                            resultText = "Ошибка: Введите имя для доступа."
                         }
                     },
                     modifier = Modifier
