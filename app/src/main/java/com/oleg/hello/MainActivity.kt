@@ -1,9 +1,5 @@
 package com.oleg.hello
 
-/*
- * Елена Игоревна: Я добавила финальные штрихи.
- * Чистота кода — это чистота твоих помыслов. Учись.
- */
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,96 +16,123 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.oleg.hello.ui.theme.HelloOlegTheme
 
+/*
+ * Елена Игоревна: Я упростила структуру, чтобы исключить ошибки импорта.
+ * Твой проект Bookplus теперь имеет надежный фундамент.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             HelloOlegTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    OlegFinalDesignScreen()
-                }
+                OlegBookplusApp()
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OlegFinalDesignScreen() {
-    // ПАМЯТЬ СОСТОЯНИЯ
+fun OlegBookplusApp() {
     var nameInput by remember { mutableStateOf("") }
     var resultText by remember { mutableStateOf("") }
-    // Ошибка ввода (для валидации)
-    var isError by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Проект Designe",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        OutlinedTextField(
-            value = nameInput,
-            onValueChange = {
-                nameInput = it
-                isError = false // Сбрасываем ошибку при вводе
-            },
-            label = { Text("Имя пользователя") },
-            isError = isError,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            supportingText = {
-                if (isError) Text("Имя не может быть пустым")
-            }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                if (nameInput.isNotBlank()) {
-                    resultText = "Привет, $nameInput! Изменения зафиксированы."
-                    isError = false
-                } else {
-                    isError = true
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text("КОММИТИТЬ ИЗМЕНЕНИЯ", fontSize = 18.sp)
-        }
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        if (resultText.isNotEmpty()) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Text(
-                    text = resultText,
-                    modifier = Modifier.padding(20.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+    // Используем Scaffold для правильной разметки экрана под Android 14
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "BOOKPLUS",
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 2.sp
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
+            )
+        },
+        floatingActionButton = {
+            // Используем текстовый символ вместо Icons.Default, чтобы избежать Unresolved reference
+            FloatingActionButton(onClick = { /* Здесь будет логика добавления книг */ }) {
+                Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    ) { innerPadding ->
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Text(
+                    text = "Авторизация в системе",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // Поле ввода с закругленными краями (как я люблю — аккуратно и четко)
+                OutlinedTextField(
+                    value = nameInput,
+                    onValueChange = { nameInput = it },
+                    label = { Text("Логин") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        if (nameInput.isNotBlank()) {
+                            resultText = "Статус: Доступ разрешен для $nameInput"
+                        } else {
+                            resultText = "Ошибка: Введите логин"
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("ПРОВЕРИТЬ", fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                // Карточка результата появится только если есть сообщение
+                if (resultText.isNotEmpty()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    ) {
+                        Text(
+                            text = resultText,
+                            modifier = Modifier.padding(20.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                }
             }
         }
     }
@@ -117,8 +140,8 @@ fun OlegFinalDesignScreen() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun OlegFinalPreview() {
+fun BookplusPreview() {
     HelloOlegTheme {
-        OlegFinalDesignScreen()
+        OlegBookplusApp()
     }
 }
