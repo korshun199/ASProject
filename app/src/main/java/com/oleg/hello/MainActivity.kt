@@ -1,33 +1,36 @@
 package com.oleg.hello
 
+/*
+ * ЕЛЕНА ИГОРЕВНА:
+ * Слушай внимательно. В этой версии я добавила управление фокусом и расширенную логику.
+ * Мы работаем в ветке feature/logic-step-two, и здесь всё должно быть безупречно.
+ */
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.oleg.hello.ui.theme.HelloOlegTheme
 
-/*
- * Елена Игоревна: Я внесла последние правки.
- * Проект теперь называется HelloOleg, как ты и требовал.
- * Чистота, порядок и никакой лишней сложности.
- */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             HelloOlegTheme {
-                HelloOlegApp()
+                // Запускаем обновленный экран второго этапа
+                OlegStepTwoScreen()
             }
         }
     }
@@ -35,36 +38,44 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HelloOlegApp() {
-    var nameInput by remember { mutableStateOf("") }
-    var resultText by remember { mutableStateOf("") }
+fun OlegStepTwoScreen() {
+    // Состояния: ввод пользователя и результат валидации
+    var userInput by remember { mutableStateOf("") }
+    var accessStatus by remember { mutableStateOf<AccessLevel>(AccessLevel.NONE) }
+
+    // Менеджер фокуса для управления клавиатурой
+    val focusManager = LocalFocusManager.current
+
+    // Анимация цвета фона в зависимости от статуса доступа
+    val cardColor by animateColorAsState(
+        targetValue = when (accessStatus) {
+            AccessLevel.GRANTED -> MaterialTheme.colorScheme.primaryContainer
+            AccessLevel.DENIED -> MaterialTheme.colorScheme.errorContainer
+            else -> MaterialTheme.colorScheme.surfaceVariant
+        }, label = "CardColorAnimation"
+    )
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "HELLO OLEG",
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 2.sp
+                        "HELLO OLEG: LOGIC STEP",
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { /* Логика будущего проекта HelloOleg */ }) {
-                Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            }
         }
-    ) { innerPadding ->
+    ) { padding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(padding),
             color = MaterialTheme.colorScheme.background
         ) {
             Column(
@@ -77,57 +88,74 @@ fun HelloOlegApp() {
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Text(
-                    text = "Идентификация пользователя",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.secondary
+                    text = "Валидация протокола",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Medium
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
                 OutlinedTextField(
-                    value = nameInput,
-                    onValueChange = { nameInput = it },
-                    label = { Text("Имя разработчика") },
+                    value = userInput,
+                    onValueChange = {
+                        userInput = it
+                        accessStatus = AccessLevel.NONE
+                    },
+                    label = { Text("Идентификатор доступа") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = {
-                        if (nameInput.isNotBlank()) {
-                            resultText = "Привет, $nameInput! Система HelloOleg запущена."
+                        // Скрываем клавиатуру при нажатии
+                        focusManager.clearFocus()
+
+                        // Логика проверки: только "Олежка" или "Oleg" получают статус GRANTED
+                        accessStatus = if (userInput.trim().equals("Олежка", ignoreCase = true) ||
+                            userInput.trim().equals("Oleg", ignoreCase = true)) {
+                            AccessLevel.GRANTED
                         } else {
-                            resultText = "Ошибка: Введите имя для доступа."
+                            AccessLevel.DENIED
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                 ) {
-                    Text("ПОДТВЕРДИТЬ", fontWeight = FontWeight.Bold)
+                    Text("ПРОВЕРИТЬ СТАТУС", fontWeight = FontWeight.Bold)
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(48.dp))
 
-                if (resultText.isNotEmpty()) {
+                // Отображение результата
+                if (accessStatus != AccessLevel.NONE) {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = cardColor),
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                        )
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Text(
-                            text = resultText,
-                            modifier = Modifier.padding(20.dp),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
+                        Column(modifier = Modifier.padding(20.dp)) {
+                            Text(
+                                text = if (accessStatus == AccessLevel.GRANTED) "СТАТУС: ПОДТВЕРЖДЕН" else "СТАТУС: ОТКЛОНЕН",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (accessStatus == AccessLevel.GRANTED)
+                                    MaterialTheme.colorScheme.onPrimaryContainer else
+                                    MaterialTheme.colorScheme.onErrorContainer
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = if (accessStatus == AccessLevel.GRANTED)
+                                    "Добро пожаловать в систему. Все протоколы активны." else
+                                    "Ошибка идентификации. Попробуйте снова или обратитесь к администратору.",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
             }
@@ -135,10 +163,15 @@ fun HelloOlegApp() {
     }
 }
 
+// Перечисление для уровней доступа - так код становится чище и понятнее
+enum class AccessLevel {
+    NONE, GRANTED, DENIED
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun HelloOlegPreview() {
+fun StepTwoPreview() {
     HelloOlegTheme {
-        HelloOlegApp()
+        OlegStepTwoScreen()
     }
 }
